@@ -26,6 +26,6 @@ Export by MediaInfo from a clip encoded by x265 3.5+1-ce882936d default setting.
 ## TODO
 
 1. 输入文件
-2. 参数区分 bool int float string
+2. ~~参数区分 bool int float string~~ (added in v0.11, 210427)
 3. 不同preset为基础
 4. 参数的简单说明

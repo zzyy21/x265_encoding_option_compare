@@ -4,10 +4,12 @@
 # Author       : zzyy21
 # Create Time  : 2021-03-24 22:24:37
 # Modifed by   : zzyy21
-# Last Modify  : 2021-04-26 23:19:12
+# Last Modify  : 2021-04-27 20:56:38
 # Description  : Compare the encoding settings of x265 video
 #                clip with the x265 default encoding settings
 # Revision     : v0.1: First draft
+#                v0.11: distinguish param types to string - 0,
+#                       bool - 1, int - 2, float - 3
 ################################################################
 
 import string
@@ -22,14 +24,17 @@ class Option:
     def __init__(self, num, name, paramType, defaultValue):
         self.num = int(num)
         self.name = name
-        self.paramType = bool(int(paramType))
-        if self.paramType:
-            self.defaultValue = bool(int(defaultValue))
-        else:
-            try:
+        self.paramType = int(paramType)
+        self.defaultValue = defaultValue
+        try:
+            if self.paramType == 1:
+                self.defaultValue = bool(int(defaultValue))
+            elif self.paramType == 2:
+                self.defaultValue = int(defaultValue)
+            elif self.paramType == 3:
                 self.defaultValue = float(defaultValue)
-            except:
-                self.defaultValue = defaultValue
+        except:
+            self.defaultValue = defaultValue
 
     def ReturnName(self):
         return self.name
@@ -61,13 +66,15 @@ class EncodingSetting:
         self.matchedNum = optionNum
         self.paramType = optionParamType
         self.optionDefaultValue = optionDefaultValue
-        if self.paramType:
-            self.value = bool(int(self.value))
-        else:
-            try:
+        try:
+            if self.paramType == 1:
+                self.value = bool(int(self.value))
+            elif self.paramType == 2:
+                self.value = int(self.value)
+            elif self.paramType == 3:
                 self.value = float(self.value)
-            except:
-                self.value = self.value
+        except:
+            self.value = self.value
         self.isDefault = self.optionDefaultValue == self.value
 
     def OptionNotFound(self):
@@ -86,7 +93,7 @@ def main():
     optionList = []
     optionStrFile = open("x265_default.txt", "r")
     for optionStr in optionStrFile:
-        optionParams = optionStr.split('\t')
+        optionParams = optionStr.strip().split('\t')
         optionList.append(Option(optionParams[0], optionParams[1], optionParams[2], optionParams[3]))
     optionList.sort(key=Option.ReturnName)
 
@@ -133,7 +140,7 @@ def main():
 
     for encodingSetting in encodingSettingList:
         if not(encodingSetting.isDefault):
-            if encodingSetting.paramType:
+            if encodingSetting.paramType == 1:
                 if encodingSetting.value:
                     print("--%s (Default: --no-%s)" % (encodingSetting.name, encodingSetting.name))
                 else:
