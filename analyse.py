@@ -4,14 +4,18 @@
 # Author       : zzyy21
 # Create Time  : 2021-03-24 22:24:37
 # Modifed by   : zzyy21
-# Last Modify  : 2021-04-27 20:56:38
+# Last Modify  : 2021-06-08 23:12:17
 # Description  : Compare the encoding settings of x265 video
 #                clip with the x265 default encoding settings
 # Revision     : v0.1: First draft
 #                v0.11: distinguish param types to string - 0,
 #                       bool - 1, int - 2, float - 3
+#                v0.12: get file from cmd option, write result
+#                       to file
 ################################################################
 
+import os
+import sys
 import string
 import re
 
@@ -34,7 +38,7 @@ class Option:
             elif self.paramType == 3:
                 self.defaultValue = float(defaultValue)
         except:
-            self.defaultValue = defaultValue
+            pass
 
     def ReturnName(self):
         return self.name
@@ -74,7 +78,7 @@ class EncodingSetting:
             elif self.paramType == 3:
                 self.value = float(self.value)
         except:
-            self.value = self.value
+            pass
         self.isDefault = self.optionDefaultValue == self.value
 
     def OptionNotFound(self):
@@ -98,7 +102,7 @@ def main():
     optionList.sort(key=Option.ReturnName)
 
     encodingSettingList = []
-    mediaInfoFile = open("mediainfo.txt", "r", encoding="utf-16-le")
+    mediaInfoFile = open(sys.argv[1], "r", encoding="utf-16-le")
     isVideoTrack = False
     for line in mediaInfoFile.readlines():
         line = line.strip()
@@ -138,15 +142,20 @@ def main():
 
     encodingSettingList.sort(key=EncodingSetting.ReturnMatchedNum)
 
+    inFileName = os.path.splitext(os.path.basename(sys.argv[1]))[0]
+    resultFile = open(inFileName + ".parse.txt", "w")
     for encodingSetting in encodingSettingList:
         if not(encodingSetting.isDefault):
             if encodingSetting.paramType == 1:
                 if encodingSetting.value:
-                    print("--%s (Default: --no-%s)" % (encodingSetting.name, encodingSetting.name))
+                    #print("--%s (Default: --no-%s)" % (encodingSetting.name, encodingSetting.name))
+                    resultFile.write("--%s (Default: --no-%s)\n" % (encodingSetting.name, encodingSetting.name))
                 else:
-                    print("--no-%s (Default: --%s)" % (encodingSetting.name, encodingSetting.name))
+                    #print("--no-%s (Default: --%s)" % (encodingSetting.name, encodingSetting.name))
+                    resultFile.write("--no-%s (Default: --%s)\n" % (encodingSetting.name, encodingSetting.name))
             else:
-                print("--%s=%s (Default: %s)" % (encodingSetting.name, encodingSetting.value, encodingSetting.optionDefaultValue))
+                #print("--%s=%s (Default: %s)" % (encodingSetting.name, encodingSetting.value, encodingSetting.optionDefaultValue))
+                resultFile.write("--%s=%s (Default: %s)\n" % (encodingSetting.name, encodingSetting.value, encodingSetting.optionDefaultValue))
 
 if __name__ == "__main__" :
     main()
