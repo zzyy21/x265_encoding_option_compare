@@ -4,7 +4,7 @@
  * @Author       : zzyy21
  * @Create Time  : 2021-04-26 23:01:27
  * @Modifed by   : zzyy21
- * @Last Modify  : 2021-06-08 23:12:26
+ * @Last Modify  : 2021-06-08 23:17:09
  * @Description  : 
  * @Revision     : 
 -->
@@ -17,7 +17,7 @@ It's only a draft version now...
 
 ## how to use
 
-Export stream information using MediaInfo as `mediainfo.txt`, copy to same directory and run `python analyse.py`.
+Export stream information using MediaInfo and drug onto `analyse.py`, or use command line `python analyse.py <mediainfo_file>`.
 
 ## default settings info
 
